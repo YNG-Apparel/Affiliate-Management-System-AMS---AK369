@@ -1,4 +1,33 @@
+# Dependencies
 node_modules/
+
+# Build outputs
 dist/
 build/
+.output/
+.vite/
+.next/
+
+# Turborepo
+.turbo/
+
+# Env
 .env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Testing
+coverage/
+
+# Editor / OS
+.idea/
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo

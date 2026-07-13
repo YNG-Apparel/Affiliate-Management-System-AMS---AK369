@@ -1,0 +1,53 @@
+// Prisma schema for the AMS API.
+// Docs: https://pris.ly/d/prisma-schema
+//
+// Models are added phase by phase. See docs/database/ for the full design.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Phase 1: Authentication & Users
+// ---------------------------------------------------------------------------
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  INACTIVE
+  ARCHIVED
+}
+
+model Role {
+  id          Int     @id @db.SmallInt
+  name        String  @unique @db.VarChar(50)
+  description String?
+
+  users User[]
+
+  @@map("roles")
+}
+
+model User {
+  id              String     @id @default(uuid()) @db.Uuid
+  roleId          Int        @map("role_id") @db.SmallInt
+  fullName        String     @map("full_name") @db.VarChar(150)
+  email           String     @unique @db.VarChar(255)
+  passwordHash    String     @map("password_hash")
+  emailVerifiedAt DateTime?  @map("email_verified_at")
+  status          UserStatus @default(PENDING)
+  lastLoginAt     DateTime?  @map("last_login_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  archivedAt      DateTime?  @map("archived_at")
+
+  role Role @relation(fields: [roleId], references: [id])
+
+  @@map("users")
+}

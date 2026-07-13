@@ -1,0 +1,36 @@
+# Local/production infrastructure for AMS.
+# Not required for development if you use a cloud database (e.g. Neon).
+# When you have Docker installed, run:  docker compose -f infrastructure/docker/docker-compose.yml up -d
+# Then set DATABASE_URL to: postgresql://ams:ams@localhost:5432/ams?schema=public
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: ams-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ams
+      POSTGRES_PASSWORD: ams
+      POSTGRES_DB: ams
+    ports:
+      - '5432:5432'
+    volumes:
+      - ams-postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ams']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: ams-redis
+    restart: unless-stopped
+    ports:
+      - '6379:6379'
+    volumes:
+      - ams-redis-data:/data
+
+volumes:
+  ams-postgres-data:
+  ams-redis-data:

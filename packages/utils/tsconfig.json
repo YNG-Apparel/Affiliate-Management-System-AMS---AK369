@@ -1,0 +1,9 @@
+{
+  "extends": "@ams/tsconfig/library.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+  "include": ["src"],
+  "references": [{ "path": "../types" }]
+}

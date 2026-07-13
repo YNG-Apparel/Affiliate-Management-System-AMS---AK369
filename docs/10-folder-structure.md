@@ -1,10 +1,26 @@
-# 10. Folder Structure
+# Folder Structure
 
-## Proposed Structure
-- frontend-admin/
-- frontend-affiliate/
-- backend/
-- packages/
-- infrastructure/
-- docs/
-- scripts/
+affiliate-management-system/
+
+apps/
+
+    api/
+    admin/
+    affiliate/
+
+packages/
+
+    ui/
+    types/
+    utils/
+    eslint-config/
+    tsconfig/
+
+docs/
+
+infrastructure/
+
+    docker/
+    nginx/
+
+scripts/

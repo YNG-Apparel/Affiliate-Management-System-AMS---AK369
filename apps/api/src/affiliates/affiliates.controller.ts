@@ -53,4 +53,10 @@ export class AffiliatesController {
   reactivate(@Param('id') id: string) {
     return this.affiliates.reactivate(id);
   }
+
+  @Patch(':id/reapply')
+  @ApiOperation({ summary: 'Resubmit a rejected (inactive) affiliate for reconsideration' })
+  reapply(@Param('id') id: string) {
+    return this.affiliates.reapply(id);
+  }
 }

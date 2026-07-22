@@ -124,6 +124,21 @@ export class AffiliatesService {
     return this.findOne(id);
   }
 
+  /** Resubmit a rejected (INACTIVE) affiliate back to PENDING for reconsideration. */
+  async reapply(id: string) {
+    const affiliate = await this.requireWithUser(id);
+    if (affiliate.user.status !== UserStatus.INACTIVE) {
+      throw new BadRequestException('Only rejected (inactive) affiliates can be resubmitted');
+    }
+
+    await this.prisma.user.update({
+      where: { id: affiliate.userId },
+      data: { status: UserStatus.PENDING },
+    });
+
+    return this.findOne(id);
+  }
+
   private async requireWithUser(id: string) {
     const affiliate = await this.prisma.affiliate.findUnique({
       where: { id },

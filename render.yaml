@@ -1,0 +1,49 @@
+# Infrastructure as Code — Render Blueprint
+# Defines the STAGING environment (API + Admin) declaratively.
+# Render reads this file on "New + > Blueprint" and creates both services.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Production (go-live) uses the same build artifacts; see docs/16-deployment.md.
+
+services:
+  # ---------------------------------------------------------------
+  # Backend API (NestJS + Prisma)
+  # ---------------------------------------------------------------
+  - type: web
+    name: ams-api
+    runtime: node
+    region: singapore
+    plan: free # staging; upgrade to "starter" or higher for production
+    branch: main
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter api db:generate && pnpm --filter api build && pnpm --filter api db:deploy
+    startCommand: pnpm --filter api start:prod
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false # secret — entered once in the Render dashboard, never in git
+      - key: JWT_SECRET
+        generateValue: true # Render generates a strong random value
+      - key: JWT_EXPIRES_IN
+        value: 1d
+      - key: NODE_VERSION
+        value: "22"
+      - key: CORS_ORIGINS
+        sync: false # set to the admin site URL after first deploy
+
+  # ---------------------------------------------------------------
+  # Admin Dashboard (React static site)
+  # ---------------------------------------------------------------
+  - type: web
+    name: ams-admin
+    runtime: static
+    branch: main
+    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter admin build
+    staticPublishPath: apps/admin/dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false # set to the API URL + /api after first deploy
+    routes:
+      # SPA fallback: all paths serve index.html so page refresh works
+      - type: rewrite
+        source: /*
+        destination: /index.html

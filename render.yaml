@@ -26,7 +26,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 1d
       - key: NODE_VERSION
-        value: "22"
+        value: '22'
       - key: CORS_ORIGINS
         sync: false # set to the admin site URL after first deploy
 
@@ -43,7 +43,7 @@ services:
     staticPublishPath: apps/admin/dist
     envVars:
       - key: NODE_VERSION
-        value: "22"
+        value: '22'
       - key: VITE_API_URL
         sync: false # set to the API URL + /api after first deploy
     routes:

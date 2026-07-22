@@ -23,17 +23,22 @@ async function bootstrap(): Promise<void> {
   // Allow the admin and affiliate frontends to call the API.
   // In dev, any localhost port is allowed (Vite may pick a different port);
   // in production, restrict to the explicit CORS_ORIGINS list.
+  // Origins are normalized (trailing slash + case) so minor config typos don't block.
+  const logger = new Logger('Bootstrap');
+  const normalizeOrigin = (o: string): string => o.trim().replace(/\/+$/, '').toLowerCase();
   const corsOrigins = (config.get<string>('CORS_ORIGINS') ?? '')
     .split(',')
-    .map((o) => o.trim())
+    .map(normalizeOrigin)
     .filter(Boolean);
   const isLocalhost = (origin: string): boolean =>
     /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  logger.log(`CORS allowed origins: ${corsOrigins.length > 0 ? corsOrigins.join(', ') : '(none configured)'}`);
   app.enableCors({
     origin: (origin, callback) => {
-      if (!origin || corsOrigins.includes(origin) || isLocalhost(origin)) {
+      if (!origin || corsOrigins.includes(normalizeOrigin(origin)) || isLocalhost(origin)) {
         callback(null, true);
       } else {
+        logger.warn(`CORS blocked origin: ${origin}`);
         callback(null, false);
       }
     },
@@ -53,7 +58,6 @@ async function bootstrap(): Promise<void> {
   const port = config.get<number>('PORT') ?? 3000;
   await app.listen(port);
 
-  const logger = new Logger('Bootstrap');
   logger.log(`API running at http://localhost:${port}/api`);
   logger.log(`Swagger docs at http://localhost:${port}/docs`);
 }

@@ -1,8 +1,15 @@
-import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User, UserStatus } from '@prisma/client';
 import * as argon2 from 'argon2';
+import { randomBytes } from 'node:crypto';
 import { UsersService } from '../users/users.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { RoleId } from './roles.constant';
@@ -14,30 +21,59 @@ export interface AuthResponse {
   user: SafeUser;
 }
 
+const STARTER_TIER_ID = 1;
+
 @Injectable()
 export class AuthService {
   constructor(
     private readonly users: UsersService,
     private readonly jwt: JwtService,
+    private readonly prisma: PrismaService,
   ) {}
 
-  async register(dto: RegisterDto): Promise<AuthResponse> {
+  /**
+   * Public sign-up: creates a PENDING affiliate account awaiting manager approval.
+   * No token is issued — the user cannot log in until approved (see login()).
+   */
+  async register(dto: RegisterDto): Promise<{ user: SafeUser; message: string }> {
     const existing = await this.users.findByEmail(dto.email);
     if (existing) {
       throw new ConflictException('Email is already registered');
     }
 
+    // A city is required on the affiliate record; assign a default the manager can change.
+    const defaultCity = await this.prisma.city.findFirst({
+      where: { isActive: true },
+      orderBy: { code: 'asc' },
+    });
+    if (!defaultCity) {
+      throw new BadRequestException('No city configured. Please contact an administrator.');
+    }
+
     const passwordHash = await argon2.hash(dto.password);
-    const user = await this.users.create({
-      fullName: dto.fullName,
-      email: dto.email,
-      passwordHash,
-      // TODO(Phase 2): default to PENDING and require manager approval before activation.
-      status: UserStatus.ACTIVE,
-      role: { connect: { id: RoleId.AFFILIATE } },
+    const affiliateCode = `AFF-${randomBytes(4).toString('hex').toUpperCase()}`;
+
+    const user = await this.prisma.user.create({
+      data: {
+        fullName: dto.fullName,
+        email: dto.email,
+        passwordHash,
+        status: UserStatus.PENDING,
+        role: { connect: { id: RoleId.AFFILIATE } },
+        affiliate: {
+          create: {
+            affiliateCode,
+            tier: { connect: { id: STARTER_TIER_ID } },
+            city: { connect: { id: defaultCity.id } },
+          },
+        },
+      },
     });
 
-    return this.buildAuthResponse(user);
+    return {
+      user: this.sanitize(user),
+      message: 'Registration submitted. Awaiting manager approval.',
+    };
   }
 
   async login(dto: LoginDto): Promise<AuthResponse> {

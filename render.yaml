@@ -37,9 +37,13 @@ services:
     name: ams-admin
     runtime: static
     branch: main
-    buildCommand: corepack enable && pnpm install --frozen-lockfile && pnpm --filter admin build
+    # No "corepack enable" here: the static build environment is read-only and
+    # already provides pnpm (it auto-installs deps from the lockfile).
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter admin build
     staticPublishPath: apps/admin/dist
     envVars:
+      - key: NODE_VERSION
+        value: "22"
       - key: VITE_API_URL
         sync: false # set to the API URL + /api after first deploy
     routes:

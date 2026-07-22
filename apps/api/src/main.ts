@@ -20,12 +20,25 @@ async function bootstrap(): Promise<void> {
     }),
   );
 
-  // Allow the admin and affiliate frontends to call the API
+  // Allow the admin and affiliate frontends to call the API.
+  // In dev, any localhost port is allowed (Vite may pick a different port);
+  // in production, restrict to the explicit CORS_ORIGINS list.
   const corsOrigins = (config.get<string>('CORS_ORIGINS') ?? '')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean);
-  app.enableCors({ origin: corsOrigins.length > 0 ? corsOrigins : true, credentials: true });
+  const isLocalhost = (origin: string): boolean =>
+    /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+  app.enableCors({
+    origin: (origin, callback) => {
+      if (!origin || corsOrigins.includes(origin) || isLocalhost(origin)) {
+        callback(null, true);
+      } else {
+        callback(null, false);
+      }
+    },
+    credentials: true,
+  });
 
   // Interactive API docs at /docs
   const swaggerConfig = new DocumentBuilder()

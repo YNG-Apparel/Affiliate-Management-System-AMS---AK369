@@ -47,7 +47,111 @@ model User {
   updatedAt       DateTime   @updatedAt @map("updated_at")
   archivedAt      DateTime?  @map("archived_at")
 
-  role Role @relation(fields: [roleId], references: [id])
+  role               Role        @relation(fields: [roleId], references: [id])
+  profile            Profile?
+  affiliate          Affiliate?  @relation("AffiliateUser")
+  approvedAffiliates Affiliate[] @relation("AffiliateApprovedBy")
+  promotedAffiliates Affiliate[] @relation("AffiliatePromotedBy")
 
   @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// Phase 2: Affiliate Management
+// ---------------------------------------------------------------------------
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum AffiliateType {
+  FREELANCE
+  INTERNAL
+}
+
+model Profile {
+  id        String    @id @default(uuid()) @db.Uuid
+  userId    String    @unique @map("user_id") @db.Uuid
+  phone     String?   @db.VarChar(20)
+  avatarUrl String?   @map("avatar_url")
+  gender    Gender?
+  birthDate DateTime? @map("birth_date") @db.Date
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("profiles")
+}
+
+model City {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(20)
+  name      String   @db.VarChar(100)
+  province  String?  @db.VarChar(100)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  affiliates Affiliate[]
+
+  @@map("cities")
+}
+
+model Bank {
+  id        String   @id @default(uuid()) @db.Uuid
+  code      String   @unique @db.VarChar(20)
+  name      String   @db.VarChar(100)
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  affiliates Affiliate[]
+
+  @@map("banks")
+}
+
+model Tier {
+  id          Int     @id @db.SmallInt
+  name        String  @db.VarChar(50)
+  level       Int     @db.SmallInt
+  multiplier  Decimal @db.Decimal(5, 2)
+  description String?
+  isActive    Boolean @default(true) @map("is_active")
+
+  affiliates Affiliate[]
+
+  @@map("tiers")
+}
+
+model Affiliate {
+  id                String        @id @default(uuid()) @db.Uuid
+  userId            String        @unique @map("user_id") @db.Uuid
+  affiliateCode     String        @unique @map("affiliate_code") @db.VarChar(20)
+  affiliateType     AffiliateType @default(FREELANCE) @map("affiliate_type")
+  tierId            Int           @map("tier_id") @db.SmallInt
+  cityId            String        @map("city_id") @db.Uuid
+  baseSalary        Decimal?      @map("base_salary") @db.Decimal(18, 2)
+  bankId            String?       @map("bank_id") @db.Uuid
+  bankAccountName   String?       @map("bank_account_name") @db.VarChar(150)
+  bankAccountNumber String?       @map("bank_account_number") @db.VarChar(50)
+  tiktokUsername    String?       @map("tiktok_username") @db.VarChar(100)
+  shopeeUsername    String?       @map("shopee_username") @db.VarChar(100)
+  tokopediaUsername String?       @map("tokopedia_username") @db.VarChar(100)
+  joinedAt          DateTime?     @map("joined_at")
+  approvedById      String?       @map("approved_by") @db.Uuid
+  promotedAt        DateTime?     @map("promoted_at")
+  promotedById      String?       @map("promoted_by") @db.Uuid
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  user       User  @relation("AffiliateUser", fields: [userId], references: [id])
+  tier       Tier  @relation(fields: [tierId], references: [id])
+  city       City  @relation(fields: [cityId], references: [id])
+  bank       Bank? @relation(fields: [bankId], references: [id])
+  approvedBy User? @relation("AffiliateApprovedBy", fields: [approvedById], references: [id])
+  promotedBy User? @relation("AffiliatePromotedBy", fields: [promotedById], references: [id])
+
+  @@map("affiliates")
 }

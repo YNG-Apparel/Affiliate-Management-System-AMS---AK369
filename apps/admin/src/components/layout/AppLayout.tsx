@@ -4,7 +4,7 @@ import { useAuth } from '../../lib/auth'
 
 const navItems = [
   { to: '/dashboard', label: 'Dashboarddd', icon: LayoutDashboard },
-  { to: '/affiliates', label: 'Afiliator', icon: Users },
+  { to: '/affiliates', label: 'Afiliatorrrr', icon: Users },
 ] as const
 
 /** Shared shell for all authenticated pages: sidebar + top bar + page outlet. */

@@ -3,7 +3,7 @@ import { LayoutDashboard, Users, LogOut } from 'lucide-react'
 import { useAuth } from '../../lib/auth'
 
 const navItems = [
-  { to: '/dashboard', label: 'Dashboarddd', icon: LayoutDashboard },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/affiliates', label: 'Afiliator', icon: Users },
 ] as const
 

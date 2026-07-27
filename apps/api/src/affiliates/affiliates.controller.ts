@@ -24,6 +24,13 @@ export class AffiliatesController {
     return this.affiliates.list(query);
   }
 
+  // Must be declared before ':id' so "/stats" isn't matched as an id.
+  @Get('stats')
+  @ApiOperation({ summary: 'Affiliate counts by status for the dashboard' })
+  stats() {
+    return this.affiliates.stats();
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get one affiliate by id' })
   findOne(@Param('id') id: string) {

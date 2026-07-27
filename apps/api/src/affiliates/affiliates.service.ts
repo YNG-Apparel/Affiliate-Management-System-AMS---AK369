@@ -14,6 +14,18 @@ const affiliateInclude = {
 export class AffiliatesService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** Affiliate counts by status, for the dashboard stat cards. */
+  async stats() {
+    const [total, pending, active, suspended, inactive] = await this.prisma.$transaction([
+      this.prisma.affiliate.count(),
+      this.prisma.affiliate.count({ where: { user: { is: { status: UserStatus.PENDING } } } }),
+      this.prisma.affiliate.count({ where: { user: { is: { status: UserStatus.ACTIVE } } } }),
+      this.prisma.affiliate.count({ where: { user: { is: { status: UserStatus.SUSPENDED } } } }),
+      this.prisma.affiliate.count({ where: { user: { is: { status: UserStatus.INACTIVE } } } }),
+    ]);
+    return { total, pending, active, suspended, inactive };
+  }
+
   async list(query: ListAffiliatesDto) {
     const { search, status, cityId, tierId, page, pageSize } = query;
 

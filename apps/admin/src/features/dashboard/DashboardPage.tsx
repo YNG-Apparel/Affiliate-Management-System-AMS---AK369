@@ -1,43 +1,51 @@
-import { useNavigate } from '@tanstack/react-router'
-import { LogOut } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { Users, Clock, CheckCircle2, PauseCircle } from 'lucide-react'
+import { getAffiliateStats } from '../../lib/affiliates'
 import { useAuth } from '../../lib/auth'
+
+const CARDS = [
+  { key: 'total', label: 'Total Afiliator', icon: Users, color: 'text-indigo-600' },
+  { key: 'pending', label: 'Menunggu Persetujuan', icon: Clock, color: 'text-amber-600' },
+  { key: 'active', label: 'Aktif', icon: CheckCircle2, color: 'text-green-600' },
+  { key: 'suspended', label: 'Ditangguhkan', icon: PauseCircle, color: 'text-orange-600' },
+] as const
 
 export function DashboardPage() {
   const auth = useAuth()
-  const navigate = useNavigate()
-
-  const handleLogout = () => {
-    auth.logout()
-    void navigate({ to: '/login' })
-  }
+  const { data, isLoading, isError } = useQuery({
+    queryKey: ['affiliate-stats'],
+    queryFn: getAffiliateStats,
+  })
 
   return (
-    <div className="min-h-full bg-gray-50 dark:bg-gray-950">
-      <header className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-4 dark:border-gray-800 dark:bg-gray-900">
-        <h1 className="text-lg font-semibold text-gray-900 dark:text-gray-100">AMS Admin</h1>
-        <div className="flex items-center gap-4">
-          <span className="text-sm text-gray-600 dark:text-gray-400">{auth.user?.fullName}</span>
-          <button
-            onClick={handleLogout}
-            className="inline-flex items-center gap-1.5 rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 transition hover:bg-gray-100 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800"
-          >
-            <LogOut className="h-4 w-4" />
-            Keluar
-          </button>
-        </div>
-      </header>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-xl font-semibold text-gray-900 dark:text-gray-100">
+          Selamat datang, {auth.user?.fullName} 👋
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">Ringkasan jaringan afiliator Anda.</p>
+      </div>
 
-      <main className="p-6">
-        <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <h2 className="text-base font-semibold text-gray-900 dark:text-gray-100">
-            Selamat datang, {auth.user?.fullName} 👋
-          </h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Kamu berhasil login. Halaman dashboard dan modul-modul (afiliator, konten, payroll)
-            akan dibangun di fase berikutnya.
-          </p>
-        </div>
-      </main>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {CARDS.map(({ key, label, icon: Icon, color }) => (
+          <div
+            key={key}
+            className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm dark:border-gray-800 dark:bg-gray-900"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-500">{label}</span>
+              <Icon className={`h-5 w-5 ${color}`} />
+            </div>
+            <p className="mt-2 text-3xl font-semibold text-gray-900 dark:text-gray-100">
+              {isLoading ? '…' : isError ? '—' : (data?.[key] ?? 0)}
+            </p>
+          </div>
+        ))}
+      </div>
+
+      {isError && (
+        <p className="text-sm text-red-600">Gagal memuat statistik. Coba muat ulang halaman.</p>
+      )}
     </div>
   )
 }

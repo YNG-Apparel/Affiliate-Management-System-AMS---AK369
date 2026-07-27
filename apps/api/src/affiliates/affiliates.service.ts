@@ -80,7 +80,10 @@ export class AffiliatesService {
     }
 
     await this.prisma.$transaction([
-      this.prisma.user.update({ where: { id: affiliate.userId }, data: { status: UserStatus.ACTIVE } }),
+      this.prisma.user.update({
+        where: { id: affiliate.userId },
+        data: { status: UserStatus.ACTIVE },
+      }),
       this.prisma.affiliate.update({
         where: { id },
         data: { joinedAt: new Date(), approvedById: managerId },

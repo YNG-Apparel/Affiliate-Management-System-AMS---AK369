@@ -20,7 +20,7 @@ export function AppLayout() {
   return (
     <div className="flex min-h-full bg-gray-50 dark:bg-gray-950">
       <aside className="flex w-56 flex-col border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900">
-        <div className="border-b border-gray-200 px-5 py-4 dark:border-gray-800">
+        <div className="flex h-16 items-center border-b border-gray-200 px-5 dark:border-gray-800">
           <span className="text-lg font-semibold text-gray-900 dark:text-gray-100">AMS Admin</span>
         </div>
         <nav className="flex-1 space-y-1 p-3">
@@ -42,7 +42,7 @@ export function AppLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-end gap-4 border-b border-gray-200 bg-white px-6 py-3 dark:border-gray-800 dark:bg-gray-900">
+        <header className="flex h-16 items-center justify-end gap-4 border-b border-gray-200 bg-white px-6 dark:border-gray-800 dark:bg-gray-900">
           <span className="text-sm text-gray-600 dark:text-gray-400">{auth.user?.fullName}</span>
           <button
             onClick={handleLogout}

@@ -3,8 +3,8 @@ import { LayoutDashboard, Users, LogOut } from 'lucide-react'
 import { useAuth } from '../../lib/auth'
 
 const navItems = [
-  { to: '/dashboard', label: 'Dashboarddd', icon: LayoutDashboard },
-  { to: '/affiliates', label: 'Afiliatorrrr', icon: Users },
+  { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { to: '/affiliates', label: 'Afiliator', icon: Users },
 ] as const
 
 /** Shared shell for all authenticated pages: sidebar + top bar + page outlet. */

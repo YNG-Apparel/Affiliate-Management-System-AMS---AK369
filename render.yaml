@@ -51,3 +51,22 @@ services:
       - type: rewrite
         source: /*
         destination: /index.html
+
+  # ---------------------------------------------------------------
+  # Affiliate Portal (React PWA static site)
+  # ---------------------------------------------------------------
+  - type: web
+    name: ams-affiliate
+    runtime: static
+    branch: main
+    buildCommand: pnpm install --frozen-lockfile && pnpm --filter affiliate build
+    staticPublishPath: apps/affiliate/dist
+    envVars:
+      - key: NODE_VERSION
+        value: '22'
+      - key: VITE_API_URL
+        sync: false # set to the API URL + /api after first deploy
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

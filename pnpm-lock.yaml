@@ -81,12 +81,30 @@ importers:
 
   apps/affiliate:
     dependencies:
+      '@hookform/resolvers':
+        specifier: ^5.4.0
+        version: 5.4.0(react-hook-form@7.81.0(react@19.2.7))
+      '@tanstack/react-query':
+        specifier: ^5.101.2
+        version: 5.101.2(react@19.2.7)
+      '@tanstack/react-router':
+        specifier: ^1.170.17
+        version: 1.170.17(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      lucide-react:
+        specifier: ^1.24.0
+        version: 1.24.0(react@19.2.7)
       react:
         specifier: ^19.2.7
         version: 19.2.7
       react-dom:
         specifier: ^19.2.7
         version: 19.2.7(react@19.2.7)
+      react-hook-form:
+        specifier: ^7.81.0
+        version: 7.81.0(react@19.2.7)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@ams/eslint-config':
         specifier: workspace:*
@@ -94,6 +112,9 @@ importers:
       '@ams/tsconfig':
         specifier: workspace:*
         version: link:../../packages/tsconfig
+      '@tailwindcss/vite':
+        specifier: ^4.3.2
+        version: 4.3.2(vite@8.1.4(@types/node@24.13.3)(jiti@2.7.0)(terser@5.49.0))
       '@types/node':
         specifier: ^24.13.2
         version: 24.13.3
@@ -109,6 +130,9 @@ importers:
       eslint:
         specifier: ^9.18.0
         version: 9.39.5(jiti@2.7.0)
+      tailwindcss:
+        specifier: ^4.3.2
+        version: 4.3.2
       typescript:
         specifier: ^5.7.3
         version: 5.9.3

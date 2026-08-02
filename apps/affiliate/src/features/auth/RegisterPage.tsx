@@ -7,6 +7,7 @@ import { UserPlus, CheckCircle2 } from 'lucide-react'
 import { apiFetch, ApiError } from '../../lib/api'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
+import { PasswordInput } from '../../components/ui/password-input'
 
 const registerSchema = z.object({
   fullName: z.string().min(2, 'Nama minimal 2 karakter').max(150),
@@ -92,7 +93,7 @@ export function RegisterPage() {
             <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
             </label>
-            <Input id="password" type="password" autoComplete="new-password" placeholder="Minimal 8 karakter" {...register('password')} />
+            <PasswordInput id="password" autoComplete="new-password" placeholder="Minimal 8 karakter" {...register('password')} />
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
 

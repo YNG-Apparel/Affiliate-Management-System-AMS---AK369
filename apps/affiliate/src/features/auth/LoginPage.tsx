@@ -8,6 +8,7 @@ import { apiFetch, ApiError } from '../../lib/api'
 import { useAuth, type AuthUser } from '../../lib/auth'
 import { Button } from '../../components/ui/button'
 import { Input } from '../../components/ui/input'
+import { PasswordInput } from '../../components/ui/password-input'
 
 const loginSchema = z.object({
   email: z.email('Email tidak valid'),
@@ -71,7 +72,7 @@ export function LoginPage() {
             <label htmlFor="password" className="mb-1 block text-sm font-medium text-gray-700 dark:text-gray-300">
               Password
             </label>
-            <Input id="password" type="password" autoComplete="current-password" placeholder="••••••••" {...register('password')} />
+            <PasswordInput id="password" autoComplete="current-password" placeholder="••••••••" {...register('password')} />
             {errors.password && <p className="mt-1 text-xs text-red-600">{errors.password.message}</p>}
           </div>
 
